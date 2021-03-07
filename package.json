@@ -1,0 +1,14 @@
+{
+  "name": "parseBNA",
+  "version": "1.0.0",
+  "description": "Simple app to parse BNA bank account extracts using Puppeteer",
+  "main": "parseeBNA.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "puppeteer": "^8.0.0"
+  }
+}
