@@ -57,28 +57,28 @@ const accountNumber = '';
   });
 
   await page.waitForFunction(() => typeof grillaMovimientos === 'object');
-  var movimientos = await page.evaluate((accountNumber) => {
+  var movements = await page.evaluate((accountNumber) => {
     return fetch(
       grillaMovimientos.config.url,
       {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
+          'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
         },
         body: new URLSearchParams({
           'numero': accountNumber,
           'tipoTandem': '11',
-          'fechaDesde': '28%2F02%2F2021',
-          'fechaHasta': '07%2F03%2F2021',
+          'fechaDesde': '01/01/2021',
+          'fechaHasta': '08/03/2021',
           'tipoMovimiento': 'DEBITOS_CREDITOS',
-          'referencia': null,
-          'codTransaccion': null,
-          'mnemotecnico': null,
+          'referencia': '',
+          'codTransaccion': '',
+          'mnemotecnico': '',
           'tipoMonto': 'TODOS_LOS_MONTOS',
-          'monto': null,
-          'desdeMonto': null,
-          'hastaMonto': null,
-          'comentario': null,
+          'monto': '',
+          'desdeMonto': '',
+          'hastaMonto': '',
+          'comentario': '',
           'linesPerPage': '1000',
           'pageNumber': '1',
           'orderingField': 'fechaMovimiento',
@@ -87,9 +87,10 @@ const accountNumber = '';
       }).then(res => res.json());
   }, accountNumber);
 
-  console.log(JSON.stringify(movimientos));
-
-  // Add exit
+  await page.waitForSelector('#salir', {visible: true});
+  await page.click('#salir');
+  console.log(JSON.stringify(movements));
+  await page.waitForNavigation({ waitUntil: 'networkidle0' });
   await browser.close();
 
 })();
