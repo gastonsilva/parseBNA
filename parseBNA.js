@@ -49,37 +49,47 @@ const accountNumber = '';
   await page.type('#clave', password);
   await page.click('#loginBox > a');
   await page.waitForNavigation({ waitUntil: 'networkidle0' });
+
   console.log('Goto: https://hb.redlink.com.ar/bna/home.htm#movimientosHistoricos');
   await page.goto('https://hb.redlink.com.ar/bna/home.htm#movimientosHistoricos', {
     waitUntil: 'networkidle2',
     timeout: 0
   });
-  console.log("Selecting account");
-  await page.waitForSelector('#seleccionarCuentaGrid > tbody tr:not(#firstrow)', { visible: true });
-  const rowNum = await page.evaluate((accountNumber) => {
-    var cuentasRows = document.querySelectorAll('#seleccionarCuentaGrid > tbody tr:not(#firstrow)');
-    for (var i = 0; i < cuentasRows.length; i++) {
-      if (cuentasRows[i].querySelector('td:nth-child(5)').innerText === accountNumber) {
-        return i;
-      }
-    }
+
+  await page.waitForFunction(() => typeof grillaMovimientos === 'object');
+  var movimientos = await page.evaluate((accountNumber) => {
+    return fetch(
+      grillaMovimientos.config.url,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams({
+          'numero': accountNumber,
+          'tipoTandem': '11',
+          'fechaDesde': '28%2F02%2F2021',
+          'fechaHasta': '07%2F03%2F2021',
+          'tipoMovimiento': 'DEBITOS_CREDITOS',
+          'referencia': null,
+          'codTransaccion': null,
+          'mnemotecnico': null,
+          'tipoMonto': 'TODOS_LOS_MONTOS',
+          'monto': null,
+          'desdeMonto': null,
+          'hastaMonto': null,
+          'comentario': null,
+          'linesPerPage': '1000',
+          'pageNumber': '1',
+          'orderingField': 'fechaMovimiento',
+          'sortOrder': 'desc'
+        })
+      }).then(res => res.json());
   }, accountNumber);
-  console.log(`Account is in row: ${rowNum}`);
-  await page.click(`#seleccionarCuentaGrid > tbody tr:nth-child(${rowNum+2})`);
-  await page.waitForSelector("#botonRealizarConsultaMovimientos", { visible: true });
-  await page.click('#botonRealizarConsultaMovimientos');
-  await page.waitForSelector("#movimientos > tbody tr:not(#firstrow)");
-  console.log('Parsing movements');
-  const movimientos = await page.evaluate(() => {
-    var movimientosRows = Array.from(document.querySelectorAll('#movimientos > tbody tr:not(#firstrow)'));
-    return movimientosRows.map((r) => {
-      return {
-        "fecha": r.querySelector('td:nth-child(2)').innerText,
-        "concepto": r.querySelector('td:nth-child(4)').innerText,
-        "importe": r.querySelector('td:nth-child(5)').innerText
-      } 
-    });
-  });
-  console.log(movimientos);
+
+  console.log(JSON.stringify(movimientos));
+
+  // Add exit
   await browser.close();
+
 })();
