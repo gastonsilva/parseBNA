@@ -1,10 +1,8 @@
 const puppeteer = require('puppeteer');
+var logger = require('morgan');
+logger('dev');
 
-const username = '';
-const password = '';
-const accountNumber = '';
-
-(async () => {
+async function parser(username, password, accountNumber) {
   console.log('Initializing...');
   console.log('Launching browser');
 
@@ -87,10 +85,13 @@ const accountNumber = '';
       }).then(res => res.json());
   }, accountNumber);
 
-  await page.waitForSelector('#salir', {visible: true});
+  await page.waitForSelector('#salir', { visible: true });
   await page.click('#salir');
-  console.log(JSON.stringify(movements));
   await page.waitForNavigation({ waitUntil: 'networkidle0' });
   await browser.close();
 
-})();
+  return movements;
+
+};
+
+module.exports = parser;
