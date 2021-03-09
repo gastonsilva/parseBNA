@@ -1,6 +1,4 @@
 const puppeteer = require('puppeteer');
-var logger = require('morgan');
-logger('dev');
 
 async function parser(username, password, accountNumber) {
   console.log('Initializing...');
